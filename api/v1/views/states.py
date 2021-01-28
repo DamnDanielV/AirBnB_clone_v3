@@ -35,7 +35,7 @@ def get_id_st(state_id):
                  methods=["DELETE"],
                  strict_slashes=False)
 def del_st(state_id):
-    state = storage.get(state_id)   # line 72 file_storage
+    state = storage.get(State, state_id)   # line 72 file_storage
     if not state:
         abort(404)
 
@@ -69,12 +69,13 @@ def post_st():
                  strict_slashes=False)
 def put_st(state_id):
     dict_st = request.get_json(silent=True)
+    keys = ["id", "updated_at", "created_at"]
     if dict_st is None:
         return jsonify({"error": "Not a JSON"}), 400
 
     state = storage.get("State", state_id)
     for key, value in dict_st.items():
-        if key not in ["id", "updated_at", "created_at"]:
+        if key not in keys:
             setattr(state, key, value)
 
     state.save()
