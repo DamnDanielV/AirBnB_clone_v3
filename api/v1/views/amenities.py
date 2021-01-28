@@ -18,10 +18,10 @@ def get_post_amenity():
     if request.method == "POST":
         amenity_json = request.get_json(silent=True)
         if amenity_json is None:
-            return jsonify({"error": "Not a JSON"}), 400
+            abort(400, "Not a JSON")
 
         if "name" not in request.json:
-                return jsonify({"error": "Missing name"}), 400
+            abort(400, "Missing name")
 
         n_amenity = Amenity(**amenity_json)
         storage.new(n_amenity)
@@ -48,7 +48,7 @@ def gdp_amenity(amenity_id):
         amenity_json = request.get_json(silent=True)
 
         if amenity_json is None:
-            return jsonify({"error": "Not a JSON"}), 400
+            abort(400, "Not a JSON")
 
         for key, value in amenity_json.items():
             if key not in keys:
@@ -59,6 +59,6 @@ def gdp_amenity(amenity_id):
         storage.delete(amenity)
         storage.save()
         storage.close()
-        return jsonify({})
+        return make_response(jsonify({}), 200)
 
     return jsonify(amenity.to_dict())
