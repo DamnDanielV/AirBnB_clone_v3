@@ -14,7 +14,7 @@ from api.v1.views import app_views
                  methods=["GET", "POST"],
                  strict_slashes=False)
 def get_post_amenity():
-    """list cities from a state and creates a new city"""
+    """list amenities from a state and creates a new city"""
     if request.method == "POST":
         amenity_json = request.get_json(silent=True)
         if amenity_json is None:
@@ -28,10 +28,12 @@ def get_post_amenity():
         storage.save()
         storage.close()
         return jsonify(n_amenity.to_dict()), 201
+    
+    elif request.method == "GET":
 
-    amenities = storage.all(Amenity)
-    l_amenities = [amenity.to_dict() for amenity in amenities.values()]
-    return jsonify(l_amenities)
+        amenities = storage.all(Amenity)
+        l_amenities = [amenity.to_dict() for amenity in amenities.values()]
+        return jsonify(l_amenities)
 
 
 @app_views.route("/amenities/<amenity_id>",
@@ -40,7 +42,7 @@ def get_post_amenity():
 def gdp_amenity(amenity_id):
     """GET DELETE PUT for amenity"""
     amenity = storage.get(Amenity, amenity_id)
-    keys = ["id", "state_id", "created_at", "updated_at"]
+    keys = ["id", "created_at", "updated_at"]
     if not amenity:
         abort(404)
 
@@ -61,4 +63,4 @@ def gdp_amenity(amenity_id):
         storage.close()
         return make_response(jsonify({}), 200)
 
-    return jsonify(amenity.to_dict())
+    return make_response(jsonify(amenity.to_dict()), 200)
