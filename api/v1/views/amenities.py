@@ -37,7 +37,6 @@ def post_amenity():
     return jsonify(n_amenity.to_dict()), 201
 
 
-
 # @app_views.route("/amenities",
 #                  methods=["GET", "POST"],
 #                  strict_slashes=False)
@@ -56,13 +55,12 @@ def post_amenity():
 #         storage.save()
 #         storage.close()
 #         return jsonify(n_amenity.to_dict()), 201
-    
+
 #     elif request.method == "GET":
 
 #         amenities = storage.all(Amenity)
 #         l_amenities = [amenity.to_dict() for amenity in amenities.values()]
 #         return jsonify(l_amenities)
-
 
 @app_views.route("/amenities/<amenity_id>",
                  methods=["GET", "PUT", "DELETE"],
