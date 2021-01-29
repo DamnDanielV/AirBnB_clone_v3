@@ -62,31 +62,78 @@ def post_amenity():
 #         l_amenities = [amenity.to_dict() for amenity in amenities.values()]
 #         return jsonify(l_amenities)
 
+
 @app_views.route("/amenities/<amenity_id>",
-                 methods=["GET", "PUT", "DELETE"],
+                 methods=["GET"],
                  strict_slashes=False)
-def gdp_amenity(amenity_id):
-    """GET DELETE PUT for amenity"""
+def get_ame_id(amenity_id):
+    """get amenity by id"""
     amenity = storage.get(Amenity, amenity_id)
-    keys = ["id", "created_at", "updated_at"]
     if not amenity:
         abort(404)
+    return (jsonify(amenity.to_dict()), 200)
 
-    if request.method == "PUT":
-        amenity_json = request.get_json(silent=True)
 
-        if amenity_json is None:
-            abort(400, "Not a JSON")
+@app_views.route("/amenities/<amenity_id>",
+                 methods=["PUT"],
+                 strict_slashes=False)
+def put_ame_id(amenity_id):
+    """put method"""
+    amenity = storage.get(Amenity, amenity_id)
+
+    amenity_json = request.get_json(silent=True)
+    keys = ["id", "created_at", "updated_at"]
+
+    if amenity_json is None:
+        abort(400, "Not a JSON")
 
         for key, value in amenity_json.items():
             if key not in keys:
                 setattr(amenity, key, value)
         amenity.save()
+    return (jsonify(amenity.to_dict()), 200)
 
-    elif request.method == "DELETE":
-        storage.delete(amenity)
-        storage.save()
-        storage.close()
-        return make_response(jsonify({}), 200)
 
-    return make_response(jsonify(amenity.to_dict()), 200)
+@app_views.route("/amenities/<amenity_id>",
+                 methods=["DELETE"],
+                 strict_slashes=False)
+def del_ame_id(amenity_id):
+    """delete an amaenity"""
+    amenity = storage.get(Amenity, amenity_id)
+    if amenity_json is None:
+        abort(400, "Not a JSON")
+
+    storage.delete(amenity)
+    storage.save()
+    storage.close()
+    return (jsonify(amenity.to_dict()), 200)
+
+
+# @app_views.route("/amenities/<amenity_id>",
+#                  methods=["GET", "PUT", "DELETE"],
+#                  strict_slashes=False)
+# def gdp_amenity(amenity_id):
+#     """GET DELETE PUT for amenity"""
+#     amenity = storage.get(Amenity, amenity_id)
+#     keys = ["id", "created_at", "updated_at"]
+#     if not amenity:
+#         abort(404)
+
+#     if request.method == "PUT":
+#         amenity_json = request.get_json(silent=True)
+
+#         if amenity_json is None:
+#             abort(400, "Not a JSON")
+
+#         for key, value in amenity_json.items():
+#             if key not in keys:
+#                 setattr(amenity, key, value)
+#         amenity.save()
+
+#     elif request.method == "DELETE":
+#         storage.delete(amenity)
+#         storage.save()
+#         storage.close()
+#         return make_response(jsonify({}), 200)
+
+#     return make_response(jsonify(amenity.to_dict()), 200)
