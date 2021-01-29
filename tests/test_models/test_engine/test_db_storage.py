@@ -90,23 +90,57 @@ class TestFileStorage(unittest.TestCase):
         """Test that save properly saves objects to file.json"""
 
 
-    def test_get_db(self):
-        """ Comment"""
-        dic = {"name": "Medellin"}
-        instance = State(**dic)
-        storage.new(instance)
-        storage.save()
-        get_instance = storage.get(State, instance.id)
-        self.assertEqual(get_instance, instance)
+class TestDBStorage_v3_methods(unittest.TestCase):
+    """Tests of methods added in V3 to DBStorage"""
 
-    def test_count(self):
-        """ Tests count method db storage """
-        dic = {"name": "Davivienda"}
-        state = State(**dic)
-        storage.new(state)
-        dic = {"name": "Jajaja", "state_id": state.id}
-        city = City(**dic)
-        storage.new(city)
-        storage.save()
-        c = storage.count()
-        self.assertEqual(len(storage.all()), c)
+    @unittest.skipIf(os.getenv('HBNB_TYPE_STORAGE') != 'db',
+                     "Testing db storage")
+    def test_dbs_get(self):
+        """Test for the get method to retrieve a specific model object
+        """
+        new_state = State(name="Arizona")
+        models.storage.new(new_state)
+        new_state.save()
+        first_state_id = list(models.storage.all("State").values())[0].id
+        self.assertEqual(models.storage.get(
+            "State", first_state_id).__class__.__name__, 'State')
+        fake_stdout = StringIO()
+        with contextlib.redirect_stdout(fake_stdout):
+            requested_state = models.storage.get("State", first_state_id)
+            print("First state: {}".format(requested_state))
+        output = fake_stdout.getvalue().strip()
+        self.assertIn(first_state_id, output)
+        new_state = State(name="Emmanuel")
+        new_state.save()
+        new_user = User(email="Emmanuel@gmail.com", password="Fake_pass")
+        new_user.save()
+        self.assertIs(new_state, models.storage.get("State", new_state.id))
+        self.assertIs(None, models.storage.get("State", "fake_data"))
+        self.assertIs(None, models.storage.get("dummy_object", "fake_data"))
+        self.assertIs(new_user, models.storage.get("User", new_user.id))
+
+    @unittest.skipIf(os.getenv('HBNB_TYPE_STORAGE') != 'db',
+                     "Testing db storage")
+    def test_dbs_count(self):
+        """Test for the get method to retrieve a specific model object
+        """
+        self.assertIs(type(models.storage.count()), int)
+        self.assertIs(type(models.storage.count("State")), int)
+        fake_stdout = StringIO()
+        with contextlib.redirect_stdout(fake_stdout):
+            print(models.storage.count())
+        output1 = fake_stdout.getvalue().strip()
+        states_stdout = StringIO()
+        with contextlib.redirect_stdout(states_stdout):
+            print(models.storage.count("State"))
+        output2 = states_stdout.getvalue().strip()
+        self.assertTrue(output1 >= output2)
+        size_all = models.storage.count()
+        states_number = models.storage.count('State')
+        self.assertEqual(models.storage.count("dummy_object"), 0)
+        new_state = State(name="Daniel")
+        new_state.save()
+        new_user = User(email="Daniel@gmail.com", password="fake_pass")
+        new_user.save()
+        self.assertEqual(models.storage.count("State"), states_number + 1)
+        self.assertEqual(models.storage.count(), size_all + 2)
