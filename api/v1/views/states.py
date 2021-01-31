@@ -22,10 +22,11 @@ def get_st():
                  methods=["GET"],
                  strict_slashes=False)
 def get_id_st(state_id):
+    u_state = storage.get(State, state_id)
     state = [value.to_dict() for key, value in storage.all("State")
              .items() if key == 'State.' + state_id]
 
-    if state[0] is None:
+    if u_state is None:
         abort(404)
     return jsonify(state[0])
 
