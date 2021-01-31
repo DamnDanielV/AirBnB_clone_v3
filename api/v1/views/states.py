@@ -23,12 +23,12 @@ def get_st():
                  strict_slashes=False)
 def get_id_st(state_id):
     u_state = storage.get(State, state_id)
-    state = [value.to_dict() for key, value in storage.all("State")
-             .items() if key == 'State.' + state_id]
+    # state = [value.to_dict() for key, value in storage.all("State")
+    #          .items() if key == 'State.' + state_id]
 
     if u_state is None:
         abort(404)
-    return jsonify(state[0])
+    return jsonify(u_state.to_dict())
 
 
 # Deletes a State object:: DELETE /api/v1/states/<state_id>
