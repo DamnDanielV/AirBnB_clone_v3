@@ -100,9 +100,8 @@ def put_ame_id(amenity_id):
 def del_ame_id(amenity_id):
     """delete an amaenity"""
     amenity = storage.get(Amenity, amenity_id)
-    if amenity_json is None:
-        abort(400, "Not a JSON")
-
+    if amenity is None:
+        abort(404)
     storage.delete(amenity)
     storage.save()
     storage.close()
